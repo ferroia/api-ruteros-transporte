@@ -5,23 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FERROCABLES® - Gestión de Ruteros & Entregas</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#eff6ff',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
-            }
-          }
-        }
-      }
-    }
-  </script>
   <style>
     body { background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
     .tab-content { display: none; }
@@ -43,7 +26,7 @@
         </div>
       </div>
 
-      <!-- NAVEGACIÓN DE PESTAÑAS -->
+      <!-- NAVEGACIÓN -->
       <nav class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
         <button onclick="switchTab('admin')" id="tab-admin" class="tab-btn px-4 py-1.5 text-xs font-semibold rounded-lg transition-all bg-blue-600 text-white shadow-md">Admin</button>
         <button onclick="switchTab('conductor')" id="tab-conductor" class="tab-btn px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white">Conductor</button>
@@ -52,14 +35,14 @@
     </div>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- CONTENIDO -->
   <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
 
     <!-- 1. PANEL ADMINISTRATIVO -->
     <section id="view-admin" class="tab-content active">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Formulario de Asignación -->
+        <!-- Formulario -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-blue-500"></span> Asignar Nuevo Rutero
@@ -87,11 +70,11 @@
           </form>
         </div>
 
-        <!-- Tabla / Lista de Ruteros Asignados -->
+        <!-- Tabla -->
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
             <span>Listado de Entregas & Estados</span>
-            <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-lg">Total Activos</span>
+            <span id="totalBadge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-lg">0 Entregas</span>
           </h2>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-300">
@@ -106,7 +89,7 @@
               </thead>
               <tbody id="adminTableBody" class="divide-y divide-slate-800/50">
                 <tr>
-                  <td class="p-3 text-slate-400 font-medium" colspan="5">Cargando lista de entregas...</td>
+                  <td class="p-3 text-slate-400 font-medium" colspan="5">No hay entregas registradas aún.</td>
                 </tr>
               </tbody>
             </table>
@@ -120,7 +103,7 @@
     <section id="view-conductor" class="tab-content">
       <div class="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
         <h2 class="text-lg font-bold text-white mb-1">Reporte del Conductor</h2>
-        <p class="text-xs text-slate-400 mb-6">Selecciona tu nombre y la entrega que estás ejecutando</p>
+        <p class="text-xs text-slate-400 mb-6">Selecciona la fecha, tu nombre y completa el reporte de entrega</p>
 
         <form id="conductorForm" class="space-y-5">
           <div>
@@ -137,8 +120,8 @@
 
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Pedidos / Entregas Asignadas</label>
-            <select id="selectPedido" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
-              <option value="">-- PRIMERO SELECCIONA TU NOMBRE --</option>
+            <select id="selectPedido" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+              <option value="">-- PRIMERO SELECCIONA FECHA Y CONDUCTOR --</option>
             </select>
           </div>
 
@@ -153,7 +136,7 @@
             </div>
           </div>
 
-          <!-- MÓDULO DE FIRMA DEL CLIENTE -->
+          <!-- FIRMA -->
           <div class="space-y-2 pt-2">
             <div class="flex justify-between items-center">
               <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Firma del Cliente (Recibido)</label>
@@ -175,17 +158,18 @@
     <section id="view-monitoreo" class="tab-content">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
         <h2 class="text-lg font-bold text-white mb-2">Monitoreo en Tiempo Real</h2>
-        <p class="text-xs text-slate-400 mb-6">Seguimiento de tiempos, ubicaciones y firmas de recibo.</p>
+        <p class="text-xs text-slate-400 mb-6">Seguimiento detallado de entregas realizadas</p>
         <div id="monitoreoList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Tarjetas de monitoreo -->
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- LÓGICA JAVASCRIPT -->
+  <!-- SCRIPT DINÁMICO CLIENTE -->
   <script>
+    let globalEntregas = [];
+
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => {
@@ -203,19 +187,176 @@
       }
     }
 
-    // Inicializar Fechas de Hoy por Defecto
+    async function cargarEntregas() {
+      try {
+        const res = await fetch('/api/ruteros');
+        globalEntregas = await res.json();
+        renderAdminTable();
+        actualizarSelectoresConductor();
+        renderMonitoreo();
+      } catch (err) {
+        console.error("Error al cargar entregas:", err);
+      }
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('adminTableBody');
+      const badge = document.getElementById('totalBadge');
+      if (!tbody) return;
+
+      if (badge) badge.innerText = `${globalEntregas.length} Entregas`;
+
+      if (globalEntregas.length === 0) {
+        tbody.innerHTML = `<tr><td class="p-3 text-slate-400 font-medium" colspan="5">No hay entregas registradas aún.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = globalEntregas.map(e => `
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-3 font-semibold text-slate-200">${e.fecha}</td>
+          <td class="p-3 text-slate-300">${e.conductor}</td>
+          <td class="p-3 text-blue-400 font-bold">${e.pedido}</td>
+          <td class="p-3 text-slate-300">${e.cliente}</td>
+          <td class="p-3">
+            <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${e.estado === 'ENTREGADO' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+              ${e.estado}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function actualizarSelectoresConductor() {
+      const fechaFiltro = document.getElementById('conductorFechaFiltro').value;
+      const selectCond = document.getElementById('selectConductor');
+      const selectPed = document.getElementById('selectPedido');
+
+      if (!selectCond || !selectPed) return;
+
+      // Filtrar conductores que tengan entregas en la fecha elegida
+      const entregasEnFecha = globalEntregas.filter(e => e.fecha === fechaFiltro);
+      const conductores = [...new Set(entregasEnFecha.map(e => e.conductor))];
+
+      const condSeleccionadoPrevio = selectCond.value;
+      selectCond.innerHTML = '<option value="">-- SELECCIONAR CONDUCTOR --</option>' + 
+        conductores.map(c => `<option value="${c}" ${c === condSeleccionadoPrevio ? 'selected' : ''}>${c}</option>`).join('');
+
+      // Filtrar pedidos del conductor seleccionado
+      const conductorActual = selectCond.value;
+      if (!conductorActual) {
+        selectPed.innerHTML = '<option value="">-- PRIMERO SELECCIONA CONDUCTOR --</option>';
+        return;
+      }
+
+      const pedidosPendientes = entregasEnFecha.filter(e => e.conductor === conductorActual);
+      
+      if (pedidosPendientes.length === 0) {
+        selectPed.innerHTML = '<option value="">-- NO HAY PEDIDOS PARA ESTA FECHA --</option>';
+      } else {
+        selectPed.innerHTML = '<option value="">-- SELECCIONAR PEDIDO --</option>' +
+          pedidosPendientes.map(e => `<option value="${e.id}">${e.pedido} - ${e.cliente} (${e.estado})</option>`).join('');
+      }
+    }
+
+    function renderMonitoreo() {
+      const list = document.getElementById('monitoreoList');
+      if (!list) return;
+
+      const completadas = globalEntregas.filter(e => e.estado === 'ENTREGADO');
+      if (completadas.length === 0) {
+        list.innerHTML = `<p class="text-sm text-slate-400 col-span-full">No se han registrado entregas completadas todavía.</p>`;
+        return;
+      }
+
+      list.innerHTML = completadas.map(e => `
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3">
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs text-slate-400">${e.fecha}</span>
+              <span class="text-xs bg-emerald-500/10 text-emerald-400 font-semibold px-2 py-0.5 rounded-md border border-emerald-500/20">ENTREGADO</span>
+            </div>
+            <h3 class="font-bold text-white text-base">${e.cliente}</h3>
+            <p class="text-xs text-blue-400 font-mono mt-1">Pedido: ${e.pedido}</p>
+            <p class="text-xs text-slate-300 mt-1">Conductor: ${e.conductor}</p>
+            <p class="text-xs text-slate-400 mt-1">Horarios: ${e.horaLlegada} - ${e.horaSalida}</p>
+          </div>
+          ${e.firma ? `<div class="bg-white rounded-lg p-2"><img src="${e.firma}" class="h-16 mx-auto object-contain" alt="Firma"></div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Inicialización al cargar la página
     document.addEventListener('DOMContentLoaded', () => {
       const today = new Date().toISOString().split('T')[0];
-      const adminFecha = document.getElementById('adminFecha');
-      const conductorFecha = document.getElementById('conductorFechaFiltro');
-      if (adminFecha) adminFecha.value = today;
-      if (conductorFecha) conductorFecha.value = today;
+      document.getElementById('adminFecha').value = today;
+      document.getElementById('conductorFechaFiltro').value = today;
 
-      // Inicializar Canvas de Firma
+      // Escuchar cambios de fecha y conductor
+      document.getElementById('conductorFechaFiltro').addEventListener('change', actualizarSelectoresConductor);
+      document.getElementById('selectConductor').addEventListener('change', actualizarSelectoresConductor);
+
+      // Formulario Admin Submit
+      document.getElementById('adminForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+          fecha: document.getElementById('adminFecha').value,
+          conductor: document.getElementById('adminConductor').value.trim(),
+          pedido: document.getElementById('adminPedido').value.trim(),
+          cliente: document.getElementById('adminCliente').value.trim()
+        };
+
+        const res = await fetch('/api/ruteros', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          document.getElementById('adminPedido').value = '';
+          document.getElementById('adminCliente').value = '';
+          await cargarEntregas();
+          alert('¡Rutero asignado con éxito!');
+        }
+      });
+
+      // Formulario Conductor Submit
+      document.getElementById('conductorForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const idEntrega = document.getElementById('selectPedido').value;
+        const canvas = document.getElementById('signatureCanvas');
+        const firmaData = canvas.toDataURL();
+
+        if (!idEntrega) {
+          alert('Por favor selecciona un pedido válido.');
+          return;
+        }
+
+        const data = {
+          id: idEntrega,
+          horaLlegada: document.getElementById('horaLlegada').value,
+          horaSalida: document.getElementById('horaSalida').value,
+          firma: firmaData
+        };
+
+        const res = await fetch('/api/ruteros/completar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          alert('¡Entrega registrada exitosamente!');
+          document.getElementById('horaLlegada').value = '';
+          document.getElementById('horaSalida').value = '';
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          await cargarEntregas();
+        }
+      });
+
+      // Canvas de Firma
       const canvas = document.getElementById('signatureCanvas');
-      if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      const clearBtn = document.getElementById('clearCanvasBtn');
       let isDrawing = false;
 
       function resizeCanvas() {
@@ -240,13 +381,15 @@
       canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(getCoords(e).x, getCoords(e).y); });
       canvas.addEventListener('mousemove', (e) => { if (isDrawing) { ctx.lineTo(getCoords(e).x, getCoords(e).y); ctx.stroke(); } });
       canvas.addEventListener('mouseup', () => isDrawing = false);
-      canvas.addEventListener('mouseleave', () => isDrawing = false);
 
       canvas.addEventListener('touchstart', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(getCoords(e).x, getCoords(e).y); }, { passive: false });
       canvas.addEventListener('touchmove', (e) => { if (e.cancelable) e.preventDefault(); if (isDrawing) { ctx.lineTo(getCoords(e).x, getCoords(e).y); ctx.stroke(); } }, { passive: false });
       canvas.addEventListener('touchend', () => isDrawing = false);
 
-      if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+      document.getElementById('clearCanvasBtn').addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+
+      // Cargar datos
+      cargarEntregas();
     });
   </script>
 </body>
