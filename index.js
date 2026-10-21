@@ -13,10 +13,80 @@ app.use((req, res, next) => {
   next();
 });
 
-let entregas = [];
 let conductores = [
   { id: '1', nombre: 'Andrés', apellido: 'Gómez' },
   { id: '2', nombre: 'Carlos', apellido: 'Pérez' }
+];
+
+const today = new Date().toISOString().split('T')[0];
+
+// Datos de prueba representativos para ver los gráficos llenos
+let entregas = [
+  {
+    id: '101',
+    fecha: today,
+    conductor: 'Andrés Gómez',
+    zona: 'Medellín',
+    tipoDocumento: 'Remisión',
+    pedido: 'REM-501',
+    cliente: 'Estructuras del Norte S.A.S.',
+    estado: 'ENTREGADO',
+    horaLlegada: '08:15',
+    horaSalida: '08:40',
+    firma: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><path d="M 10 20 Q 30 5 50 20 T 90 20" stroke="black" fill="none" stroke-width="2"/></svg>'
+  },
+  {
+    id: '102',
+    fecha: today,
+    conductor: 'Carlos Pérez',
+    zona: 'Oriente',
+    tipoDocumento: 'Factura',
+    pedido: 'F-9021',
+    cliente: 'Constructora El Peñol',
+    estado: 'ENTREGADO',
+    horaLlegada: '09:00',
+    horaSalida: '09:40',
+    firma: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><path d="M 10 15 Q 40 35 70 15" stroke="black" fill="none" stroke-width="2"/></svg>'
+  },
+  {
+    id: '103',
+    fecha: today,
+    conductor: 'Andrés Gómez',
+    zona: 'Oriente',
+    tipoDocumento: 'Factura',
+    pedido: 'F-9040',
+    cliente: 'Obras San Nicolás',
+    estado: 'ENTREGADO',
+    horaLlegada: '10:10',
+    horaSalida: '10:40',
+    firma: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><path d="M 15 25 Q 45 5 75 25" stroke="black" fill="none" stroke-width="2"/></svg>'
+  },
+  {
+    id: '104',
+    fecha: today,
+    conductor: 'Carlos Pérez',
+    zona: 'Medellín',
+    tipoDocumento: 'Remisión',
+    pedido: 'REM-505',
+    cliente: 'Ingeniería Bello S.A.S.',
+    estado: 'ASIGNADO',
+    horaLlegada: '',
+    horaSalida: '',
+    firma: ''
+  },
+  {
+    id: '105',
+    fecha: today,
+    conductor: 'Andrés Gómez',
+    zona: 'Medellín',
+    tipoDocumento: 'Factura',
+    pedido: 'F-9100',
+    cliente: 'Construcciones Poblado',
+    estado: 'ASIGNADO',
+    horaLlegada: '',
+    horaSalida: '',
+    firma: ''
+  }
 ];
 
 app.get('/api/conductores', (req, res) => {
