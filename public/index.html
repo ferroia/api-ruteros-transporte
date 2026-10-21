@@ -411,12 +411,18 @@
         e.preventDefault();
         const idEntrega = document.getElementById('selectPedido').value;
         const canvas = document.getElementById('signatureCanvas');
-        const firmaData = canvas.toDataURL();
 
         if (!idEntrega) {
           alert('Por favor selecciona un documento válido.');
           return;
         }
+
+        if (!hasSigned) {
+          alert('Por favor solicita la firma del cliente antes de registrar la entrega.');
+          return;
+        }
+
+        const firmaData = canvas.toDataURL('image/png');
 
         const data = {
           id: idEntrega,
@@ -441,45 +447,68 @@
         }
       });
 
-      // Canvas
+      // Canvas de Firma Optimizado Táctil + Mouse
       const canvas = document.getElementById('signatureCanvas');
       const ctx = canvas.getContext('2d');
       let isDrawing = false;
+      let hasSigned = false;
 
-      function resizeCanvas() {
+      function initCanvas() {
         const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 2.5;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
+        canvas.width = rect.width || 350;
+        canvas.height = 140;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "#020617";
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        hasSigned = false;
       }
 
-      setTimeout(resizeCanvas, 100);
-      window.addEventListener('resize', resizeCanvas);
+      setTimeout(initCanvas, 200);
+      window.addEventListener('resize', initCanvas);
 
-      function getCoords(e) {
+      function getPos(e) {
         const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return {
-          x: (clientX - rect.left) * scaleX,
-          y: (clientY - rect.top) * scaleY
+          x: (clientX - rect.left) * (canvas.width / rect.width),
+          y: (clientY - rect.top) * (canvas.height / rect.height)
         };
       }
 
-      canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(getCoords(e).x, getCoords(e).y); });
-      canvas.addEventListener('mousemove', (e) => { if (isDrawing) { ctx.lineTo(getCoords(e).x, getCoords(e).y); ctx.stroke(); } });
-      canvas.addEventListener('mouseup', () => isDrawing = false);
+      function startDraw(e) {
+        isDrawing = true;
+        hasSigned = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+      }
 
-      canvas.addEventListener('touchstart', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(getCoords(e).x, getCoords(e).y); }, { passive: false });
-      canvas.addEventListener('touchmove', (e) => { if (e.cancelable) e.preventDefault(); if (isDrawing) { ctx.lineTo(getCoords(e).x, getCoords(e).y); ctx.stroke(); } }, { passive: false });
-      canvas.addEventListener('touchend', () => isDrawing = false);
+      function moveDraw(e) {
+        if (!isDrawing) return;
+        if (e.cancelable) e.preventDefault();
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      }
 
-      document.getElementById('clearCanvasBtn').addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+      function stopDraw() { isDrawing = false; }
+
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', moveDraw);
+      canvas.addEventListener('mouseup', stopDraw);
+      canvas.addEventListener('mouseleave', stopDraw);
+
+      canvas.addEventListener('touchstart', startDraw, { passive: false });
+      canvas.addEventListener('touchmove', moveDraw, { passive: false });
+      canvas.addEventListener('touchend', stopDraw);
+
+      document.getElementById('clearCanvasBtn').addEventListener('click', () => {
+        initCanvas();
+      });
 
       // Carga inicial
       cargarConductores();
