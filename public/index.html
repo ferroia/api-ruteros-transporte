@@ -184,7 +184,7 @@
         <!-- Chart 4: Proporción Facturas vs Remisiones -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
-            <span>Distribución por Tipo de Documento</span>
+            <span>Distribución por Zonas (Medellín vs. Oriente)</span>
             <span class="text-[10px] text-amber-400 font-mono">Proporción</span>
           </h3>
           <div class="h-64 relative flex items-center justify-center">
@@ -663,26 +663,26 @@
       });
     }
 
-    // Chart 4: Tipo Doc
+    // Chart 4: Zonas Geográficas (Medellín vs. Oriente)
     function renderChartTipoDoc(entregas) {
       const ctx = document.getElementById('chartTipoDoc').getContext('2d');
       if (chartTipoDocInstance) chartTipoDocInstance.destroy();
 
-      let facturas = 0;
-      let remisiones = 0;
+      let medellin = 0;
+      let oriente = 0;
 
       entregas.forEach(e => {
-        if ((e.tipoDocumento || 'Factura') === 'Factura') facturas++;
-        else remisiones++;
+        if ((e.zona || 'Medellín') === 'Medellín') medellin++;
+        else oriente++;
       });
 
       chartTipoDocInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Facturas', 'Remisiones'],
+          labels: ['Medellín', 'Oriente'],
           datasets: [{
-            data: [facturas, remisiones],
-            backgroundColor: ['#3b82f6', '#f59e0b'],
+            data: [medellin, oriente],
+            backgroundColor: ['#06b6d4', '#f59e0b'],
             borderWidth: 0
           }]
         },
