@@ -77,6 +77,12 @@
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Cliente / Destino</label>
               <input type="text" id="adminCliente" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500" placeholder="Ej: Obras y Estructuras S.A.S.">
             </div>
+            
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Fecha Programada de Entrega</label>
+              <input type="date" id="adminFecha" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500">
+            </div>
+
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-blue-600/20">
               Guardar y Asignar Rutero
             </button>
@@ -94,6 +100,7 @@
               <thead class="bg-slate-950 text-slate-400 text-xs uppercase tracking-wider">
                 <tr>
                   <th class="p-3 rounded-l-lg">Conductor</th>
+                  <th class="p-3">Fecha</th>
                   <th class="p-3">Pedido</th>
                   <th class="p-3">Cliente</th>
                   <th class="p-3 rounded-r-lg">Estado</th>
@@ -118,6 +125,12 @@
         <p class="text-xs text-slate-400 mb-6">Selecciona tu nombre y la entrega que estás ejecutando</p>
 
         <form id="conductorForm" class="space-y-5">
+          
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Fecha de Trabajo</label>
+            <input type="date" id="conductorFechaFiltro" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+          </div>
+
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Conductor</label>
             <select id="selectConductor" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
@@ -154,7 +167,13 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2">
+          
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Fecha Programada de Entrega</label>
+              <input type="date" id="adminFecha" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500">
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2">
             <span>✓</span> Registrar Entrega Realizada
           </button>
         </form>
@@ -232,5 +251,16 @@
       if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
     });
   </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const adminFecha = document.getElementById('adminFecha');
+      const conductorFecha = document.getElementById('conductorFechaFiltro');
+      if (adminFecha) adminFecha.value = today;
+      if (conductorFecha) conductorFecha.value = today;
+    });
+  </script>
+
 </body>
 </html>
