@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FERROCABLES® - Analytics & Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
+    <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <style>
     body { background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
     .tab-content { display: none; }
@@ -151,8 +152,11 @@
         <!-- Chart 1: Entregas por Día -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
-            <span>Volumen de Pedidos Entregados por Día</span>
-            <span class="text-[10px] text-blue-400 font-mono">Diario</span>
+            <span>Volumen de Pedidos Entregados</span>
+            <select id="groupModeVolumen" onchange="renderDashboard()" class="bg-slate-950 border border-slate-800 text-[11px] font-mono text-blue-400 rounded-lg px-2 py-0.5 focus:outline-none">
+              <option value="day" selected>Por Día</option>
+              <option value="month">Por Mes</option>
+            </select>
           </h3>
           <div class="h-64 relative">
             <canvas id="chartDiario"></canvas>
@@ -388,6 +392,7 @@
     let chartConductoresInstance = null;
     let chartTiempoInstance = null;
     let chartTipoDocInstance = null;
+    Chart.register(ChartDataLabels);
 
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -556,6 +561,20 @@
       const labels = Object.keys(porFecha).sort();
       const data = labels.map(l => porFecha[l]);
 
+      const mode = document.getElementById('groupModeVolumen') ? document.getElementById('groupModeVolumen').value : 'day';
+      const porAgrupacion = {};
+
+      entregas.forEach(e => {
+        let key = e.fecha;
+        if (mode === 'month') {
+          key = e.fecha.substring(0, 7); // AAAA-MM
+        }
+        porAgrupacion[key] = (porAgrupacion[key] || 0) + 1;
+      });
+
+      const labels = Object.keys(porAgrupacion).sort();
+      const data = labels.map(l => porAgrupacion[l]);
+
       chartDiarioInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -564,18 +583,26 @@
             label: 'Pedidos Entregados',
             data: data.length ? data : [0],
             borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
             fill: true,
             tension: 0.3,
-            borderWidth: 2,
-            pointRadius: 4,
+            borderWidth: 3,
+            pointRadius: 6,
             pointBackgroundColor: '#60a5fa'
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              color: '#ffffff',
+              align: 'top',
+              font: { weight: 'bold', size: 12 },
+              formatter: (val) => val > 0 ? val : ''
+            }
+          },
           scales: {
             x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e293b' } },
             y: { ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1 }, grid: { color: '#1e293b' }, beginAtZero: true }
@@ -612,7 +639,7 @@
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: { legend: { display: false }, datalabels: { color: '#ffffff', anchor: 'end', align: 'end', font: { weight: 'bold', size: 12 }, formatter: (v) => v > 0 ? v + ' entregas' : '' } },
           scales: {
             x: { ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1 }, grid: { color: '#1e293b' }, beginAtZero: true },
             y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } }
@@ -654,7 +681,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: { legend: { display: false }, datalabels: { color: '#ffffff', anchor: 'end', align: 'end', font: { weight: 'bold', size: 12 }, formatter: (v) => v > 0 ? v + ' entregas' : '' } },
           scales: {
             x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
             y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e293b' }, beginAtZero: true }

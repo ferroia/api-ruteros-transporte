@@ -15,78 +15,25 @@ app.use((req, res, next) => {
 
 let conductores = [
   { id: '1', nombre: 'Andrés', apellido: 'Gómez' },
-  { id: '2', nombre: 'Carlos', apellido: 'Pérez' }
+  { id: '2', nombre: 'Carlos', apellido: 'Pérez' },
+  { id: '3', nombre: 'Mateo', apellido: 'Restrepo' }
 ];
 
-const today = new Date().toISOString().split('T')[0];
+const firmaDemo = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><path d="M 10 20 Q 30 5 50 20 T 90 20" stroke="black" fill="none" stroke-width="2"/></svg>';
 
-// Datos de prueba representativos para ver los gráficos llenos
+// Historial enriquecido con fechas pasadas y del mes para ver tendencias
 let entregas = [
-  {
-    id: '101',
-    fecha: today,
-    conductor: 'Andrés Gómez',
-    zona: 'Medellín',
-    tipoDocumento: 'Remisión',
-    pedido: 'REM-501',
-    cliente: 'Estructuras del Norte S.A.S.',
-    estado: 'ENTREGADO',
-    horaLlegada: '08:15',
-    horaSalida: '08:40',
-    firma: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><path d="M 10 20 Q 30 5 50 20 T 90 20" stroke="black" fill="none" stroke-width="2"/></svg>'
-  },
-  {
-    id: '102',
-    fecha: today,
-    conductor: 'Carlos Pérez',
-    zona: 'Oriente',
-    tipoDocumento: 'Factura',
-    pedido: 'F-9021',
-    cliente: 'Constructora El Peñol',
-    estado: 'ENTREGADO',
-    horaLlegada: '09:00',
-    horaSalida: '09:40',
-    firma: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><path d="M 10 15 Q 40 35 70 15" stroke="black" fill="none" stroke-width="2"/></svg>'
-  },
-  {
-    id: '103',
-    fecha: today,
-    conductor: 'Andrés Gómez',
-    zona: 'Oriente',
-    tipoDocumento: 'Factura',
-    pedido: 'F-9040',
-    cliente: 'Obras San Nicolás',
-    estado: 'ENTREGADO',
-    horaLlegada: '10:10',
-    horaSalida: '10:40',
-    firma: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><path d="M 15 25 Q 45 5 75 25" stroke="black" fill="none" stroke-width="2"/></svg>'
-  },
-  {
-    id: '104',
-    fecha: today,
-    conductor: 'Carlos Pérez',
-    zona: 'Medellín',
-    tipoDocumento: 'Remisión',
-    pedido: 'REM-505',
-    cliente: 'Ingeniería Bello S.A.S.',
-    estado: 'ASIGNADO',
-    horaLlegada: '',
-    horaSalida: '',
-    firma: ''
-  },
-  {
-    id: '105',
-    fecha: today,
-    conductor: 'Andrés Gómez',
-    zona: 'Medellín',
-    tipoDocumento: 'Factura',
-    pedido: 'F-9100',
-    cliente: 'Construcciones Poblado',
-    estado: 'ASIGNADO',
-    horaLlegada: '',
-    horaSalida: '',
-    firma: ''
-  }
+  { id: '201', fecha: '2026-09-15', conductor: 'Andrés Gómez', zona: 'Medellín', tipoDocumento: 'Factura', pedido: 'F-8100', cliente: 'Construcciones El Norte', estado: 'ENTREGADO', horaLlegada: '08:00', horaSalida: '08:35', firma: firmaDemo },
+  { id: '202', fecha: '2026-09-20', conductor: 'Carlos Pérez', zona: 'Oriente', tipoDocumento: 'Remisión', pedido: 'REM-410', cliente: 'Obras Rionegro', estado: 'ENTREGADO', horaLlegada: '09:10', horaSalida: '09:50', firma: firmaDemo },
+  { id: '203', fecha: '2026-10-01', conductor: 'Mateo Restrepo', zona: 'Medellín', tipoDocumento: 'Factura', pedido: 'F-8900', cliente: 'Ingeniería Poblado', estado: 'ENTREGADO', horaLlegada: '07:30', horaSalida: '08:05', firma: firmaDemo },
+  { id: '204', fecha: '2026-10-05', conductor: 'Andrés Gómez', zona: 'Oriente', tipoDocumento: 'Factura', pedido: 'F-8920', cliente: 'Constructora Marinilla', estado: 'ENTREGADO', horaLlegada: '10:00', horaSalida: '10:30', firma: firmaDemo },
+  { id: '205', fecha: '2026-10-10', conductor: 'Carlos Pérez', zona: 'Medellín', tipoDocumento: 'Remisión', pedido: 'REM-480', cliente: 'Estructuras envigado', estado: 'ENTREGADO', horaLlegada: '11:15', horaSalida: '11:45', firma: firmaDemo },
+  { id: '206', fecha: '2026-10-15', conductor: 'Mateo Restrepo', zona: 'Oriente', tipoDocumento: 'Factura', pedido: 'F-9010', cliente: 'Redes Guarne', estado: 'ENTREGADO', horaLlegada: '08:45', horaSalida: '09:15', firma: firmaDemo },
+  { id: '207', fecha: '2026-10-20', conductor: 'Andrés Gómez', zona: 'Medellín', tipoDocumento: 'Remisión', pedido: 'REM-501', cliente: 'Estructuras del Norte', estado: 'ENTREGADO', horaLlegada: '08:15', horaSalida: '08:40', firma: firmaDemo },
+  { id: '208', fecha: '2026-10-20', conductor: 'Carlos Pérez', zona: 'Oriente', tipoDocumento: 'Factura', pedido: 'F-9021', cliente: 'Constructora El Peñol', estado: 'ENTREGADO', horaLlegada: '09:00', horaSalida: '09:40', firma: firmaDemo },
+  { id: '209', fecha: '2026-10-21', conductor: 'Andrés Gómez', zona: 'Oriente', tipoDocumento: 'Factura', pedido: 'F-9040', cliente: 'Obras San Nicolás', estado: 'ENTREGADO', horaLlegada: '10:10', horaSalida: '10:40', firma: firmaDemo },
+  { id: '210', fecha: '2026-10-21', conductor: 'Carlos Pérez', zona: 'Medellín', tipoDocumento: 'Remisión', pedido: 'REM-505', cliente: 'Ingeniería Bello', estado: 'ASIGNADO', horaLlegada: '', horaSalida: '', firma: '' },
+  { id: '211', fecha: '2026-10-21', conductor: 'Mateo Restrepo', zona: 'Medellín', tipoDocumento: 'Factura', pedido: 'F-9100', cliente: 'Construcciones Sabaneta', estado: 'ASIGNADO', horaLlegada: '', horaSalida: '', firma: '' }
 ];
 
 app.get('/api/conductores', (req, res) => {
