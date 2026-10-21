@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FERROCABLES® - Analytics & Management</title>
+  <title>FERROCABLES® - RUTERO</title>
   <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <!-- Chart.js & Datalabels CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <style>
     body { background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
     .tab-content { display: none; }
@@ -44,7 +44,7 @@
     <!-- 0. PESTAÑA DASHBOARD (METRICAS) -->
     <section id="view-dashboard" class="tab-content active space-y-6">
       
-      <!-- BARRA DE FILTROS AVANZADOS -->
+      <!-- BARRA DE FILTROS -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
@@ -54,45 +54,28 @@
         <div class="flex flex-wrap items-center gap-3">
           <div>
             <label class="block text-[10px] font-semibold text-slate-400 uppercase">Rango Rápido</label>
-            <select id="filterPreset" class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
-              <option value="all">Todo el Historial</option>
+            <select id="filterPreset" onchange="aplicarFiltrosDashboard()" class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
+              <option value="all" selected>Todo el Historial</option>
               <option value="today">Hoy</option>
-              <option value="week">Esta Semana</option>
-              <option value="month" selected>Este Mes</option>
+              <option value="month">Este Mes</option>
               <option value="year">Este Año</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-[10px] font-semibold text-slate-400 uppercase">Desde</label>
-            <input type="date" id="filterDesde" class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
-          </div>
-
-          <div>
-            <label class="block text-[10px] font-semibold text-slate-400 uppercase">Hasta</label>
-            <input type="date" id="filterHasta" class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
-          </div>
-
-          <div>
             <label class="block text-[10px] font-semibold text-slate-400 uppercase">Conductor</label>
-            <select id="filterConductor" class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
+            <select id="filterConductor" onchange="aplicarFiltrosDashboard()" class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
               <option value="all">Todos</option>
             </select>
           </div>
 
           <div>
             <label class="block text-[10px] font-semibold text-slate-400 uppercase">Documento</label>
-            <select id="filterTipoDoc" class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
+            <select id="filterTipoDoc" onchange="aplicarFiltrosDashboard()" class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
               <option value="all">Todos</option>
               <option value="Factura">Facturas</option>
               <option value="Remisión">Remisiones</option>
             </select>
-          </div>
-
-          <div class="flex items-end pt-3">
-            <button onclick="aplicarFiltrosDashboard()" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-1.5 rounded-xl text-xs transition-all shadow-md shadow-blue-600/20">
-              Filtrar Metrics
-            </button>
           </div>
         </div>
       </div>
@@ -146,10 +129,10 @@
 
       </div>
 
-      <!-- REJILLA DE GRÁFICOS CIENTÍFICOS -->
+      <!-- REJILLA DE GRÁFICOS -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- Chart 1: Entregas por Día -->
+        <!-- Chart 1: Volumen de Pedidos -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
             <span>Volumen de Pedidos Entregados</span>
@@ -166,7 +149,7 @@
         <!-- Chart 2: Entregas por Conductor -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
-            <span>Rendimiento por Conductor (Entregas Efetivas)</span>
+            <span>Rendimiento por Conductor</span>
             <span class="text-[10px] text-emerald-400 font-mono">Ranking</span>
           </h3>
           <div class="h-64 relative">
@@ -174,10 +157,10 @@
           </div>
         </div>
 
-        <!-- Chart 3: Tiempo Promedio de Descargue por Conductor -->
+        <!-- Chart 3: Tiempo Promedio de Descargue -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
-            <span>Tiempo Promedio de Descargue por Conductor (Minutos)</span>
+            <span>Tiempo Promedio de Descargue (Minutos)</span>
             <span class="text-[10px] text-purple-400 font-mono">Eficiencia</span>
           </h3>
           <div class="h-64 relative">
@@ -185,7 +168,7 @@
           </div>
         </div>
 
-        <!-- Chart 4: Proporción Facturas vs Remisiones -->
+        <!-- Chart 4: Zonas Geográficas -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
             <span>Distribución por Zonas (Medellín vs. Oriente)</span>
@@ -202,10 +185,8 @@
 
     <!-- 1. PANEL ADMINISTRATIVO -->
     <section id="view-admin" class="tab-content space-y-6">
-      
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Form Asignar -->
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-blue-500"></span> Asignar Nuevo Rutero
@@ -244,7 +225,7 @@
               <input type="text" id="adminPedido" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500" placeholder="Ej: F-10492 o REM-882">
             </div>
 
-            <div class="md:col-span-2">
+            <div>
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Cliente / Destino</label>
               <input type="text" id="adminCliente" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500" placeholder="Ej: Obras y Estructuras S.A.S.">
             </div>
@@ -257,7 +238,6 @@
           </form>
         </div>
 
-        <!-- Módulo Crear Conductor -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
           <div>
             <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
@@ -285,7 +265,6 @@
 
       </div>
 
-      <!-- Tabla de Entregas -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
         <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
           <span>Listado de Entregas & Estados</span>
@@ -306,13 +285,12 @@
             </thead>
             <tbody id="adminTableBody" class="divide-y divide-slate-800/50">
               <tr>
-                <td class="p-3 text-slate-400 font-medium" colspan="6">No hay entregas registradas aún.</td>
+                <td class="p-3 text-slate-400 font-medium" colspan="7">No hay entregas registradas aún.</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
     </section>
 
     <!-- 2. PANEL DEL CONDUCTOR -->
@@ -352,7 +330,6 @@
             </div>
           </div>
 
-          <!-- FIRMA -->
           <div class="space-y-2 pt-2">
             <div class="flex justify-between items-center">
               <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Firma del Cliente (Recibido)</label>
@@ -382,17 +359,15 @@
 
   </main>
 
-  <!-- LÓGICA JAVASCRIPT ANALÍTICA -->
+  <!-- LÓGICA JAVASCRIPT -->
   <script>
     let globalEntregas = [];
     let globalConductores = [];
 
-    // Instancias de Chart.js
     let chartDiarioInstance = null;
     let chartConductoresInstance = null;
     let chartTiempoInstance = null;
     let chartTipoDocInstance = null;
-    Chart.register(ChartDataLabels);
 
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -452,7 +427,6 @@
       }
     }
 
-    // CÁLCULO DE DIFERENCIA EN MINUTOS
     function calcularMinutosDescargue(horaIni, horaFin) {
       if (!horaIni || !horaFin) return 0;
       const [h1, m1] = horaIni.split(':').map(Number);
@@ -463,20 +437,14 @@
       return diff > 0 ? diff : 0;
     }
 
-    // DASHBOARD & GRÁFICOS
     function renderDashboard() {
-      // Aplicar filtros
       const preset = document.getElementById('filterPreset').value;
-      const fDesde = document.getElementById('filterDesde').value;
-      const fHasta = document.getElementById('filterHasta').value;
       const fCond = document.getElementById('filterConductor').value;
       const fTipo = document.getElementById('filterTipoDoc').value;
 
       const hoyStr = new Date().toISOString().split('T')[0];
-
       let filtradas = [...globalEntregas];
 
-      // Filtro Preset
       if (preset === 'today') {
         filtradas = filtradas.filter(e => e.fecha === hoyStr);
       } else if (preset === 'month') {
@@ -487,17 +455,9 @@
         filtradas = filtradas.filter(e => e.fecha.startsWith(currentYear));
       }
 
-      // Filtro Fecha Personalizada
-      if (fDesde) filtradas = filtradas.filter(e => e.fecha >= fDesde);
-      if (fHasta) filtradas = filtradas.filter(e => e.fecha <= fHasta);
-
-      // Filtro Conductor
       if (fCond !== 'all') filtradas = filtradas.filter(e => e.conductor === fCond);
-
-      // Filtro Tipo Doc
       if (fTipo !== 'all') filtradas = filtradas.filter(e => (e.tipoDocumento || 'Factura') === fTipo);
 
-      // Calcular KPIs
       const completadas = filtradas.filter(e => e.estado === 'ENTREGADO');
       const totalAsignados = filtradas.length;
       const totalCompletadas = completadas.length;
@@ -508,7 +468,6 @@
       const efectividad = totalAsignados > 0 ? Math.round((totalCompletadas / totalAsignados) * 100) : 0;
       document.getElementById('kpiEfectividad').innerText = `${efectividad}%`;
 
-      // Promedio Tiempo Descargue
       let sumaMinutos = 0;
       let entregasConTiempo = 0;
       completadas.forEach(e => {
@@ -521,7 +480,6 @@
       const promedioMinutos = entregasConTiempo > 0 ? Math.round(sumaMinutos / entregasConTiempo) : 0;
       document.getElementById('kpiPromedioTiempo').innerText = `${promedioMinutos} min`;
 
-      // Conductor Top
       const conteoConductores = {};
       completadas.forEach(e => {
         conteoConductores[e.conductor] = (conteoConductores[e.conductor] || 0) + 1;
@@ -537,7 +495,6 @@
       document.getElementById('kpiTopConductor').innerText = topConductor;
       document.getElementById('kpiTopConductorCount').innerText = `${topCount} entregas hechas`;
 
-      // GENERAR DATA PARA GRÁFICOS
       renderChartDiario(completadas);
       renderChartConductores(completadas);
       renderChartTiempoDescargue(completadas);
@@ -548,18 +505,9 @@
       renderDashboard();
     }
 
-    // Chart 1: Diario
     function renderChartDiario(entregas) {
       const ctx = document.getElementById('chartDiario').getContext('2d');
       if (chartDiarioInstance) chartDiarioInstance.destroy();
-
-      const porFecha = {};
-      entregas.forEach(e => {
-        porFecha[e.fecha] = (porFecha[e.fecha] || 0) + 1;
-      });
-
-      const labels = Object.keys(porFecha).sort();
-      const data = labels.map(l => porFecha[l]);
 
       const mode = document.getElementById('groupModeVolumen') ? document.getElementById('groupModeVolumen').value : 'day';
       const porAgrupacion = {};
@@ -567,7 +515,7 @@
       entregas.forEach(e => {
         let key = e.fecha;
         if (mode === 'month') {
-          key = e.fecha.substring(0, 7); // AAAA-MM
+          key = e.fecha.substring(0, 7);
         }
         porAgrupacion[key] = (porAgrupacion[key] || 0) + 1;
       });
@@ -591,6 +539,7 @@
             pointBackgroundColor: '#60a5fa'
           }]
         },
+        plugins: [ChartDataLabels],
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -611,7 +560,6 @@
       });
     }
 
-    // Chart 2: Conductores
     function renderChartConductores(entregas) {
       const ctx = document.getElementById('chartConductores').getContext('2d');
       if (chartConductoresInstance) chartConductoresInstance.destroy();
@@ -635,11 +583,21 @@
             borderRadius: 6
           }]
         },
+        plugins: [ChartDataLabels],
         options: {
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false }, datalabels: { color: '#ffffff', anchor: 'end', align: 'end', font: { weight: 'bold', size: 12 }, formatter: (v) => v > 0 ? v + ' entregas' : '' } },
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              color: '#ffffff',
+              anchor: 'end',
+              align: 'end',
+              font: { weight: 'bold', size: 12 },
+              formatter: (v) => v > 0 ? v + ' entregas' : ''
+            }
+          },
           scales: {
             x: { ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1 }, grid: { color: '#1e293b' }, beginAtZero: true },
             y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } }
@@ -648,7 +606,6 @@
       });
     }
 
-    // Chart 3: Tiempo Descargue por Conductor
     function renderChartTiempoDescargue(entregas) {
       const ctx = document.getElementById('chartTiempoDescargue').getContext('2d');
       if (chartTiempoInstance) chartTiempoInstance.destroy();
@@ -678,10 +635,20 @@
             borderRadius: 6
           }]
         },
+        plugins: [ChartDataLabels],
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false }, datalabels: { color: '#ffffff', anchor: 'end', align: 'end', font: { weight: 'bold', size: 12 }, formatter: (v) => v > 0 ? v + ' entregas' : '' } },
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              color: '#ffffff',
+              anchor: 'end',
+              align: 'top',
+              font: { weight: 'bold', size: 12 },
+              formatter: (v) => v > 0 ? v + ' min' : ''
+            }
+          },
           scales: {
             x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
             y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e293b' }, beginAtZero: true }
@@ -690,7 +657,6 @@
       });
     }
 
-    // Chart 4: Zonas Geográficas (Medellín vs. Oriente)
     function renderChartTipoDoc(entregas) {
       const ctx = document.getElementById('chartTipoDoc').getContext('2d');
       if (chartTipoDocInstance) chartTipoDocInstance.destroy();
@@ -713,11 +679,22 @@
             borderWidth: 0
           }]
         },
+        plugins: [ChartDataLabels],
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#94a3b8', font: { size: 11 } }, position: 'bottom' }
+            legend: { labels: { color: '#94a3b8', font: { size: 11 } }, position: 'bottom' },
+            datalabels: {
+              color: '#ffffff',
+              font: { weight: 'bold', size: 12 },
+              formatter: (val, ctx) => {
+                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                if (total === 0 || val === 0) return '';
+                const pct = Math.round((val / total) * 100);
+                return `${val} (${pct}%)`;
+              }
+            }
           },
           cutout: '70%'
         }
@@ -732,7 +709,7 @@
       if (badge) badge.innerText = `${globalEntregas.length} Entregas`;
 
       if (globalEntregas.length === 0) {
-        tbody.innerHTML = `<tr><td class="p-3 text-slate-400 font-medium" colspan="6">No hay entregas registradas aún.</td></tr>`;
+        tbody.innerHTML = `<tr><td class="p-3 text-slate-400 font-medium" colspan="7">No hay entregas registradas aún.</td></tr>`;
         return;
       }
 
@@ -801,7 +778,7 @@
               <span class="text-xs bg-emerald-500/10 text-emerald-400 font-semibold px-2 py-0.5 rounded-md border border-emerald-500/20">ENTREGADO</span>
             </div>
             <h3 class="font-bold text-white text-base">${e.cliente}</h3>
-            <p class="text-xs text-blue-400 font-mono mt-1">${e.tipoDocumento || 'Doc'}: ${e.pedido}</p>
+            <p class="text-xs text-blue-400 font-mono mt-1">Zona: ${e.zona || 'Medellín'} | ${e.tipoDocumento || 'Doc'}: ${e.pedido}</p>
             <p class="text-xs text-slate-300 mt-1">Conductor: ${e.conductor}</p>
             <p class="text-xs text-slate-400 mt-1">Horarios: ${e.horaLlegada} - ${e.horaSalida}</p>
           </div>
