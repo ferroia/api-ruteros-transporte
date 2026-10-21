@@ -265,14 +265,49 @@
 
       </div>
 
-      <!-- ARCHIVO HISTÓRICO EN CARPETAS POR MES Y DÍA -->
+      <!-- 1. PROGRAMACIÓN ACTIVA / DÍA SIGUIENTE -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+              <span>Rutero Activo Programado (En Curso / Siguiente Día)</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Entregas pendientes por ejecutar asignadas a los conductores</p>
+          </div>
+          <span id="activeBadge" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-lg font-semibold">0 Asignados</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-950 text-slate-400 text-xs uppercase tracking-wider">
+              <tr>
+                <th class="p-3 rounded-l-lg">Fecha</th>
+                <th class="p-3">Conductor</th>
+                <th class="p-3">Zona</th>
+                <th class="p-3">Tipo</th>
+                <th class="p-3">N° Documento</th>
+                <th class="p-3">Cliente</th>
+                <th class="p-3 rounded-r-lg">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="activeTableBody" class="divide-y divide-slate-800/50">
+              <tr>
+                <td class="p-3 text-slate-400 font-medium" colspan="7">No hay entregas pendientes programadas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 2. ARCHIVO HISTÓRICO AUTOMÁTICO EN CARPETAS POR MES Y DÍA -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
           <div>
             <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
-              <span>📁 Archivo Histórico de Entregas & Firmas</span>
+              <span>📁 Archivo Histórico (Histórico por Mes → Día)</span>
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Organizado automáticamente en carpetas por Mes y Subcarpetas por Día</p>
+            <p class="text-xs text-slate-400 mt-0.5">Se archivan automáticamente una vez finalizadas o superada la fecha</p>
           </div>
           
           <div class="flex items-center gap-3">
@@ -281,7 +316,6 @@
           </div>
         </div>
 
-        <!-- CONTENEDOR DE CARPETAS DESPLEGABLES -->
         <div id="foldersArchiveContainer" class="space-y-3">
           <p class="text-xs text-slate-400">Cargando archivo histórico de carpetas...</p>
         </div>
@@ -438,7 +472,7 @@
       const fTipo = document.getElementById('filterTipoDoc').value;
 
       const hoyStr = new Date().toISOString().split('T')[0];
-      let filtradas = [...globalEntregas];
+      let filtradas = globalEntregas.filter(e => e.estado === "ENTREGADO");
 
       if (preset === 'today') {
         filtradas = filtradas.filter(e => e.fecha === hoyStr);
@@ -697,7 +731,42 @@
     }
 
     function renderAdminTable() {
+      renderActiveTable();
       renderFoldersArchive();
+    }
+
+    function renderActiveTable() {
+      const tbody = document.getElementById('activeTableBody');
+      const badge = document.getElementById('activeBadge');
+      if (!tbody) return;
+
+      const hoyStr = new Date().toISOString().split('T')[0];
+
+      // Entregas activas: en estado ASIGNADO (independiente de la fecha o programadas para hoy/adelante)
+      const activas = globalEntregas.filter(e => e.estado === 'ASIGNADO');
+
+      if (badge) badge.innerText = `${activas.length} Pendientes`;
+
+      if (activas.length === 0) {
+        tbody.innerHTML = `<tr><td class="p-3 text-slate-400 font-medium" colspan="7">No hay entregas pendientes programadas.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = activas.map(e => `
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-3 font-semibold text-slate-200">${e.fecha}</td>
+          <td class="p-3 text-slate-300 font-medium">${e.conductor}</td>
+          <td class="p-3"><span class="px-2 py-0.5 text-xs rounded ${e.zona === 'Oriente' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'} font-semibold">${e.zona || 'Medellín'}</span></td>
+          <td class="p-3"><span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300 border border-slate-700">${e.tipoDocumento || 'Factura'}</span></td>
+          <td class="p-3 text-blue-400 font-bold">${e.pedido}</td>
+          <td class="p-3 text-slate-300">${e.cliente}</td>
+          <td class="p-3">
+            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+              ${e.estado}
+            </span>
+          </td>
+        </tr>
+      `).join('');
     }
 
     function toggleElement(id) {
@@ -712,7 +781,7 @@
 
       if (!container) return;
 
-      let filtradas = [...globalEntregas];
+      let filtradas = globalEntregas.filter(e => e.estado === "ENTREGADO");
 
       if (search) {
         filtradas = filtradas.filter(e => 
