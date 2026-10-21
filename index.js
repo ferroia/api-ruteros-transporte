@@ -42,14 +42,15 @@ app.get('/api/ruteros', (req, res) => {
 });
 
 app.post('/api/ruteros', (req, res) => {
-  const { fecha, conductor, tipoDocumento, pedido, cliente } = req.body;
-  if (!fecha || !conductor || !tipoDocumento || !pedido || !cliente) {
+  const { fecha, conductor, zona, tipoDocumento, pedido, cliente } = req.body;
+  if (!fecha || !conductor || !zona || !tipoDocumento || !pedido || !cliente) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
   const nuevaEntrega = {
     id: Date.now().toString(),
     fecha,
     conductor,
+    zona,
     tipoDocumento,
     pedido,
     cliente,

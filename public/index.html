@@ -220,6 +220,14 @@
             </div>
 
             <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Zona de Ruta</label>
+              <select id="adminZona" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500">
+                <option value="Medellín">Medellín</option>
+                <option value="Oriente">Oriente</option>
+              </select>
+            </div>
+
+            <div>
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Tipo de Documento</label>
               <select id="adminTipoDoc" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500">
                 <option value="Factura">Factura</option>
@@ -285,6 +293,7 @@
               <tr>
                 <th class="p-3 rounded-l-lg">Fecha</th>
                 <th class="p-3">Conductor</th>
+                <th class="p-3">Zona</th>
                 <th class="p-3">Tipo</th>
                 <th class="p-3">N° Documento</th>
                 <th class="p-3">Cliente</th>
@@ -704,6 +713,7 @@
         <tr class="hover:bg-slate-800/40">
           <td class="p-3 font-semibold text-slate-200">${e.fecha}</td>
           <td class="p-3 text-slate-300 font-medium">${e.conductor}</td>
+          <td class="p-3"><span class="px-2 py-0.5 text-xs rounded ${e.zona === 'Oriente' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'} font-semibold">${e.zona || 'Medellín'}</span></td>
           <td class="p-3"><span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300 border border-slate-700">${e.tipoDocumento || 'Factura'}</span></td>
           <td class="p-3 text-blue-400 font-bold">${e.pedido}</td>
           <td class="p-3 text-slate-300">${e.cliente}</td>
@@ -742,7 +752,7 @@
         selectPed.innerHTML = '<option value="">-- NO HAY DOCUMENTOS PENDIENTES --</option>';
       } else {
         selectPed.innerHTML = '<option value="">-- SELECCIONAR DOCUMENTO --</option>' +
-          pedidosPendientes.map(e => `<option value="${e.id}">[${e.tipoDocumento || 'Doc'}] ${e.pedido} - ${e.cliente}</option>`).join('');
+          pedidosPendientes.map(e => `<option value="${e.id}">[${e.zona || 'Medellín'}] [${e.tipoDocumento || 'Doc'}] ${e.pedido} - ${e.cliente}</option>`).join('');
       }
     }
 
@@ -807,6 +817,7 @@
         const data = {
           fecha: document.getElementById('adminFecha').value,
           conductor: document.getElementById('adminConductorSelect').value,
+          zona: document.getElementById('adminZona').value,
           tipoDocumento: document.getElementById('adminTipoDoc').value,
           pedido: document.getElementById('adminPedido').value.trim(),
           cliente: document.getElementById('adminCliente').value.trim()
