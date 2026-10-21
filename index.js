@@ -33,7 +33,7 @@ app.post('/api/ruteros', (req, res) => {
     conductor,
     pedido,
     cliente,
-    estado: 'PENDIENTE',
+    estado: 'ASIGNADO',
     horaLlegada: '',
     horaSalida: '',
     firma: ''
