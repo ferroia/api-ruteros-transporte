@@ -6,7 +6,6 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Desactivar caché HTTP
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   res.set('Pragma', 'no-cache');
@@ -14,14 +13,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Base de datos en memoria
 let entregas = [];
 let conductores = [
   { id: '1', nombre: 'Andrés', apellido: 'Gómez' },
   { id: '2', nombre: 'Carlos', apellido: 'Pérez' }
 ];
 
-// Endpoints de Conductores
 app.get('/api/conductores', (req, res) => {
   res.json(conductores);
 });
@@ -40,7 +37,6 @@ app.post('/api/conductores', (req, res) => {
   res.json({ success: true, conductor: nuevoConductor });
 });
 
-// Endpoints de Ruteros
 app.get('/api/ruteros', (req, res) => {
   res.json(entregas);
 });
