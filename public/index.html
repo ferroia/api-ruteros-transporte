@@ -265,30 +265,25 @@
 
       </div>
 
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
-          <span>Listado de Entregas & Estados</span>
-          <span id="totalBadge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-lg">0 Entregas</span>
-        </h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm text-slate-300">
-            <thead class="bg-slate-950 text-slate-400 text-xs uppercase tracking-wider">
-              <tr>
-                <th class="p-3 rounded-l-lg">Fecha</th>
-                <th class="p-3">Conductor</th>
-                <th class="p-3">Zona</th>
-                <th class="p-3">Tipo</th>
-                <th class="p-3">N° Documento</th>
-                <th class="p-3">Cliente</th>
-                <th class="p-3 rounded-r-lg">Estado</th>
-              </tr>
-            </thead>
-            <tbody id="adminTableBody" class="divide-y divide-slate-800/50">
-              <tr>
-                <td class="p-3 text-slate-400 font-medium" colspan="7">No hay entregas registradas aún.</td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- ARCHIVO HISTÓRICO EN CARPETAS POR MES Y DÍA -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+              <span>📁 Archivo Histórico de Entregas & Firmas</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Organizado automáticamente en carpetas por Mes y Subcarpetas por Día</p>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <input type="text" id="searchFolderInput" onkeyup="renderFoldersArchive()" placeholder="🔍 Buscar cliente, pedido o conductor..." class="bg-slate-950 border border-slate-800 text-xs rounded-xl px-3 py-1.5 text-slate-100 focus:outline-none focus:border-blue-500 w-64">
+            <span id="totalBadge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-lg font-mono">0 Entregas</span>
+          </div>
+        </div>
+
+        <!-- CONTENEDOR DE CARPETAS DESPLEGABLES -->
+        <div id="foldersArchiveContainer" class="space-y-3">
+          <p class="text-xs text-slate-400">Cargando archivo histórico de carpetas...</p>
         </div>
       </div>
     </section>
@@ -702,32 +697,140 @@
     }
 
     function renderAdminTable() {
-      const tbody = document.getElementById('adminTableBody');
+      renderFoldersArchive();
+    }
+
+    function toggleElement(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function renderFoldersArchive() {
+      const container = document.getElementById('foldersArchiveContainer');
       const badge = document.getElementById('totalBadge');
-      if (!tbody) return;
+      const search = document.getElementById('searchFolderInput') ? document.getElementById('searchFolderInput').value.toLowerCase().trim() : '';
 
-      if (badge) badge.innerText = `${globalEntregas.length} Entregas`;
+      if (!container) return;
 
-      if (globalEntregas.length === 0) {
-        tbody.innerHTML = `<tr><td class="p-3 text-slate-400 font-medium" colspan="7">No hay entregas registradas aún.</td></tr>`;
+      let filtradas = [...globalEntregas];
+
+      if (search) {
+        filtradas = filtradas.filter(e => 
+          e.cliente.toLowerCase().includes(search) ||
+          e.pedido.toLowerCase().includes(search) ||
+          e.conductor.toLowerCase().includes(search) ||
+          e.fecha.includes(search)
+        );
+      }
+
+      if (badge) badge.innerText = `${filtradas.length} Entregas`;
+
+      if (filtradas.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 py-4">No se encontraron entregas que coincidan con la búsqueda o carpeta.</p>`;
         return;
       }
 
-      tbody.innerHTML = globalEntregas.map(e => `
-        <tr class="hover:bg-slate-800/40">
-          <td class="p-3 font-semibold text-slate-200">${e.fecha}</td>
-          <td class="p-3 text-slate-300 font-medium">${e.conductor}</td>
-          <td class="p-3"><span class="px-2 py-0.5 text-xs rounded ${e.zona === 'Oriente' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'} font-semibold">${e.zona || 'Medellín'}</span></td>
-          <td class="p-3"><span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300 border border-slate-700">${e.tipoDocumento || 'Factura'}</span></td>
-          <td class="p-3 text-blue-400 font-bold">${e.pedido}</td>
-          <td class="p-3 text-slate-300">${e.cliente}</td>
-          <td class="p-3">
-            <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${e.estado === 'ENTREGADO' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'}">
-              ${e.estado}
-            </span>
-          </td>
-        </tr>
-      `).join('');
+      // Agrupar por Mes (AAAA-MM)
+      const porMes = {};
+      filtradas.forEach(e => {
+        const mesKey = e.fecha.substring(0, 7);
+        if (!porMes[mesKey]) porMes[mesKey] = {};
+        
+        // Agrupar por Día (AAAA-MM-DD)
+        if (!porMes[mesKey][e.fecha]) porMes[mesKey][e.fecha] = [];
+        porMes[mesKey][e.fecha].push(e);
+      });
+
+      const mesesOrdenados = Object.keys(porMes).sort().reverse();
+
+      container.innerHTML = mesesOrdenados.map((mes, idxMes) => {
+        const diasObj = porMes[mes];
+        const diasOrdenados = Object.keys(diasObj).sort().reverse();
+        const totalEntregasMes = diasOrdenados.reduce((acc, d) => acc + diasObj[d].length, 0);
+
+        const idMesContent = `mes_content_${idxMes}`;
+
+        return `
+          <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/60">
+            <!-- CARPETA DE MES -->
+            <button onclick="toggleElement('${idMesContent}')" class="w-full px-4 py-3 bg-slate-900/90 hover:bg-slate-800/80 flex items-center justify-between text-left transition-all">
+              <div class="flex items-center space-x-3">
+                <span class="text-lg">📁</span>
+                <span class="font-bold text-sm text-slate-100">Carpeta Mes: ${mes}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-lg border border-blue-500/20 font-semibold">${totalEntregasMes} entregas</span>
+                <span class="text-slate-400 text-xs">▼</span>
+              </div>
+            </button>
+
+            <!-- CONTENIDO DE DÍAS -->
+            <div id="${idMesContent}" class="${search ? '' : (idxMes === 0 ? '' : 'hidden')} p-3 space-y-3 bg-slate-950">
+              ${diasOrdenados.map((dia, idxDia) => {
+                const entregasDia = diasObj[dia];
+                const idDiaContent = `dia_content_${idxMes}_${idxDia}`;
+
+                return `
+                  <div class="border border-slate-800/80 rounded-lg overflow-hidden bg-slate-900/40">
+                    <!-- SUBCARPETA DÍA -->
+                    <button onclick="toggleElement('${idDiaContent}')" class="w-full px-3.5 py-2.5 bg-slate-900/50 hover:bg-slate-800/50 flex items-center justify-between text-left transition-all">
+                      <div class="flex items-center space-x-2">
+                        <span class="text-sm">📅</span>
+                        <span class="font-semibold text-xs text-slate-200">Día: ${dia}</span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">${entregasDia.length} registros</span>
+                        <span class="text-slate-500 text-xs">▼</span>
+                      </div>
+                    </button>
+
+                    <!-- FILAS DE ENTREGAS DEL DÍA -->
+                    <div id="${idDiaContent}" class="${search ? '' : (idxDia === 0 ? '' : 'hidden')} p-2 overflow-x-auto">
+                      <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-950/80 text-slate-400 text-[10px] uppercase tracking-wider">
+                          <tr>
+                            <th class="p-2">Hora / Doc</th>
+                            <th class="p-2">Conductor</th>
+                            <th class="p-2">Zona</th>
+                            <th class="p-2">Cliente</th>
+                            <th class="p-2">Estado</th>
+                            <th class="p-2 text-right">Firma</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/40">
+                          ${entregasDia.map(e => `
+                            <tr class="hover:bg-slate-800/30">
+                              <td class="p-2">
+                                <div class="font-bold text-blue-400">${e.pedido}</div>
+                                <div class="text-[10px] text-slate-500">${e.tipoDocumento || 'Doc'}</div>
+                              </td>
+                              <td class="p-2 font-medium text-slate-200">${e.conductor}</td>
+                              <td class="p-2">
+                                <span class="px-2 py-0.5 text-[10px] rounded ${e.zona === 'Oriente' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'} font-semibold">
+                                  ${e.zona || 'Medellín'}
+                                </span>
+                              </td>
+                              <td class="p-2 text-slate-300">${e.cliente}</td>
+                              <td class="p-2">
+                                <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full ${e.estado === 'ENTREGADO' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'}">
+                                  ${e.estado}
+                                </span>
+                              </td>
+                              <td class="p-2 text-right">
+                                ${e.firma ? `<button onclick="switchTab('monitoreo')" class="text-[10px] bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded border border-white/20">Ver Firma ✓</button>` : `<span class="text-slate-600 text-[10px]">Sin firma</span>`}
+                              </td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function actualizarSelectoresConductor() {
