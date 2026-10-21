@@ -14,23 +14,47 @@ app.use((req, res, next) => {
   next();
 });
 
-// Base de datos temporal en memoria
+// Base de datos en memoria
 let entregas = [];
+let conductores = [
+  { id: '1', nombre: 'Andrés', apellido: 'Gómez' },
+  { id: '2', nombre: 'Carlos', apellido: 'Pérez' }
+];
 
-// API Endpoints
+// Endpoints de Conductores
+app.get('/api/conductores', (req, res) => {
+  res.json(conductores);
+});
+
+app.post('/api/conductores', (req, res) => {
+  const { nombre, apellido } = req.body;
+  if (!nombre || !apellido) {
+    return res.status(400).json({ error: 'Nombre y Apellido son requeridos' });
+  }
+  const nuevoConductor = {
+    id: Date.now().toString(),
+    nombre: nombre.trim(),
+    apellido: apellido.trim()
+  };
+  conductores.push(nuevoConductor);
+  res.json({ success: true, conductor: nuevoConductor });
+});
+
+// Endpoints de Ruteros
 app.get('/api/ruteros', (req, res) => {
   res.json(entregas);
 });
 
 app.post('/api/ruteros', (req, res) => {
-  const { fecha, conductor, pedido, cliente } = req.body;
-  if (!fecha || !conductor || !pedido || !cliente) {
+  const { fecha, conductor, tipoDocumento, pedido, cliente } = req.body;
+  if (!fecha || !conductor || !tipoDocumento || !pedido || !cliente) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
   const nuevaEntrega = {
     id: Date.now().toString(),
     fecha,
     conductor,
+    tipoDocumento,
     pedido,
     cliente,
     estado: 'ASIGNADO',
@@ -55,7 +79,6 @@ app.post('/api/ruteros/completar', (req, res) => {
   res.json({ success: true, entrega });
 });
 
-// Servir estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
